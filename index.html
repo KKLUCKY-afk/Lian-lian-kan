@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>简单连连看</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        #game-container {
+            text-align: center;
+        }
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(6, 50px);
+            grid-gap: 5px;
+            margin-bottom: 20px;
+        }
+        .tile {
+            width: 50px;
+            height: 50px;
+            background-color: #3498db;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+        }
+        .selected {
+            background-color: #e74c3c;
+        }
+        .matched {
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>简单连连看</h1>
+        <div id="game-board"></div>
+        <p>分数: <span id="score">0</span></p>
+    </div>
+
+    <script>
+        const gameBoard = document.getElementById('game-board');
+        const scoreElement = document.getElementById('score');
+        let score = 0;
+        let selectedTiles = [];
+        const symbols = ['🍎', '🍌', '🍇', '🍊', '🍓', '🍉'];
+        let tiles = [];
+
+        function createBoard() {
+            const shuffledSymbols = [...symbols, ...symbols].sort(() => 0.5 - Math.random());
+            for (let i = 0; i < 36; i++) {
+                const tile = document.createElement('div');
+                tile.classList.add('tile');
+                tile.textContent = shuffledSymbols[i];
+                tile.addEventListener('click', () => selectTile(tile, i));
+                gameBoard.appendChild(tile);
+                tiles.push(tile);
+            }
+        }
+
+        function selectTile(tile, index) {
+            if (selectedTiles.length < 2 && !selectedTiles.includes(tile) && !tile.classList.contains('matched')) {
+                tile.classList.add('selected');
+                selectedTiles.push(tile);
+
+                if (selectedTiles.length === 2) {
+                    setTimeout(checkMatch, 500);
+                }
+            }
+        }
+
+        function checkMatch() {
+            const [tile1, tile2] = selectedTiles;
+            if (tile1.textContent === tile2.textContent) {
+                tile1.classList.add('matched');
+                tile2.classList.add('matched');
+                score += 10;
+                scoreElement.textContent = score;
+            }
+            tile1.classList.remove('selected');
+            tile2.classList.remove('selected');
+            selectedTiles = [];
+
+            if (tiles.every(tile => tile.classList.contains('matched'))) {
+                alert('恭喜你赢了！');
+            }
+        }
+
+        createBoard();
+    </script>
+</body>
+</html>
